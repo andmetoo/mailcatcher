@@ -110,7 +110,7 @@ Multi-architecture support:
 ## 🔄 CI/CD
 
 Automated via GitHub Actions:
-- ✅ Testing on Go 1.22, 1.23
+- ✅ Testing on Go 1.24, 1.25
 - ✅ Linting with golangci-lint
 - ✅ Multi-platform Docker builds
 - ✅ Automated releases with GoReleaser

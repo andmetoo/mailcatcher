@@ -60,20 +60,7 @@ lint: ## Run linters
 fmt: ## Format code
 	@echo "$(GREEN)Formatting code...$(NC)"
 	go fmt ./...
-	goimports -w .
-
-vet: ## Run go vet
-	@echo "$(GREEN)Running go vet...$(NC)"
-	go vet ./...
-
-mod-tidy: ## Tidy go.mod
-	@echo "$(GREEN)Tidying go.mod...$(NC)"
-	go mod tidy
-	go mod verify
-
-mod-download: ## Download dependencies
-	@echo "$(GREEN)Downloading dependencies...$(NC)"
-	go mod download
+	golangci-lint fmt
 
 clean: ## Clean build artifacts
 	@echo "$(GREEN)Cleaning...$(NC)"

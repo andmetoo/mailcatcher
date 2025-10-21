@@ -9,9 +9,10 @@ import (
 )
 
 func TestMailCatcher(t *testing.T) {
-	// Start mail catcher
-	server, err := mailcatcher.DefaultServer()
-	if err != nil {
+	// Start mail catcher with dynamic ports to avoid conflicts
+	server := mailcatcher.New(0, 0) // Use port 0 for dynamic port allocation
+
+	if err := server.Start(); err != nil {
 		t.Fatalf("Failed to start mail catcher: %v", err)
 	}
 

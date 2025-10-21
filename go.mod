@@ -1,6 +1,6 @@
 module github.com/andmetoo/mailcatcher
 
-go 1.25
+go 1.24
 
 require (
 	github.com/emersion/go-smtp v0.24.0
