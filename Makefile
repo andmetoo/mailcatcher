@@ -80,27 +80,6 @@ docker-build: ## Build Docker image
 	@echo "$(GREEN)Building Docker image...$(NC)"
 	docker build -t $(DOCKER_IMAGE):$(VERSION) -t $(DOCKER_IMAGE):latest .
 
-docker-run: ## Run Docker container
-	@echo "$(GREEN)Running Docker container...$(NC)"
-	docker run --rm -p 1025:1025 -p 8025:8025 $(DOCKER_IMAGE):latest
-
-docker-compose-up: ## Start with docker-compose
-	@echo "$(GREEN)Starting with docker-compose...$(NC)"
-	docker-compose up
-
-docker-compose-down: ## Stop docker-compose
-	@echo "$(GREEN)Stopping docker-compose...$(NC)"
-	docker-compose down
-
-docker-compose-build: ## Build with docker-compose
-	@echo "$(GREEN)Building with docker-compose...$(NC)"
-	docker-compose build
-
-docker-push: ## Push Docker image to registry
-	@echo "$(GREEN)Pushing Docker image...$(NC)"
-	docker push $(DOCKER_IMAGE):$(VERSION)
-	docker push $(DOCKER_IMAGE):latest
-
 release-dry-run: ## Run goreleaser in dry-run mode
 	@echo "$(GREEN)Running goreleaser (dry-run)...$(NC)"
 	goreleaser release --snapshot --clean --skip=publish

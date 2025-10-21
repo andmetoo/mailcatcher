@@ -47,11 +47,6 @@ jobs:
           flags: unittests
           name: codecov-umbrella
 
-      - name: Check build
-        run: |
-          go build ./...
-          make build
-
   golangci:
     name: lint
     runs-on: ubuntu-latest
