@@ -1,0 +1,74 @@
+name: Build
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+
+jobs:
+  build-matrix:
+    name: Build (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        go-version: ['1.23']
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go-version }}
+
+      - name: Build with Makefile (Unix)
+        if: runner.os != 'Windows'
+        run: make build
+
+      - name: Build with Go (Windows)
+        if: runner.os == 'Windows'
+        run: go build -o dist/mailcatcher.exe ./cmd/mailcatcher
+
+      - name: Test binary (Unix)
+        if: runner.os != 'Windows'
+        run: dist/mailcatcher -version
+
+      - name: Test binary (Windows)
+        if: runner.os == 'Windows'
+        run: dist/mailcatcher.exe -version
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mailcatcher-${{ runner.os }}
+          path: dist/mailcatcher*
+          retention-days: 7
+
+  build-all-platforms:
+    name: Build all platforms
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+
+      - name: Build all platforms
+        run: make build-all
+
+      - name: List built binaries
+        run: ls -lh dist/
+
+      - name: Upload all artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: mailcatcher-all-platforms
+          path: dist/*
+          retention-days: 7

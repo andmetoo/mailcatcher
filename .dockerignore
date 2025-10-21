@@ -1,0 +1,29 @@
+# Git
+.git
+.gitignore
+
+# Build artifacts
+*.exe
+*.test
+*.out
+coverage.out
+mailcatcher
+
+# Documentation
+*.md
+!README.md
+LICENSE
+
+# IDE
+.vscode/
+.idea/
+.cursor/
+.claude/
+
+# Environment
+.env
+.env.local
+
+# CI/CD
+.github/
+.goreleaser.yml

@@ -1,0 +1,128 @@
+version: 2
+
+before:
+  hooks:
+    - go mod tidy
+    - go test ./...
+
+builds:
+  - id: mailcatcher
+    main: ./cmd/mailcatcher
+    binary: mailcatcher
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+      - arm
+    goarm:
+      - "7"
+    ldflags:
+      - -s -w
+      - -X main.version={{.Version}}
+      - -X main.commit={{.Commit}}
+      - -X main.date={{.Date}}
+    ignore:
+      - goos: windows
+        goarch: arm64
+      - goos: windows
+        goarch: arm
+
+archives:
+  - id: mailcatcher
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- .Version }}_
+      {{- title .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+    format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      - LICENSE
+      - README.md
+      - .env.example
+
+checksum:
+  name_template: 'checksums.txt'
+
+changelog:
+  sort: asc
+  use: github
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+      - '^chore:'
+      - 'typo'
+  groups:
+    - title: Features
+      regexp: '^.*?feat(\([[:word:]]+\))??!?:.+$'
+      order: 0
+    - title: 'Bug fixes'
+      regexp: '^.*?fix(\([[:word:]]+\))??!?:.+$'
+      order: 1
+    - title: 'Performance improvements'
+      regexp: '^.*?perf(\([[:word:]]+\))??!?:.+$'
+      order: 2
+    - title: Others
+      order: 999
+
+dockers:
+  - image_templates:
+      - "ghcr.io/andmetoo/mailcatcher:{{ .Version }}-amd64"
+      - "ghcr.io/andmetoo/mailcatcher:latest-amd64"
+    use: buildx
+    dockerfile: Dockerfile
+    build_flag_templates:
+      - "--platform=linux/amd64"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.title={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+    goarch: amd64
+
+  - image_templates:
+      - "ghcr.io/andmetoo/mailcatcher:{{ .Version }}-arm64"
+      - "ghcr.io/andmetoo/mailcatcher:latest-arm64"
+    use: buildx
+    dockerfile: Dockerfile
+    build_flag_templates:
+      - "--platform=linux/arm64"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.title={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+    goarch: arm64
+
+docker_manifests:
+  - name_template: "ghcr.io/andmetoo/mailcatcher:{{ .Version }}"
+    image_templates:
+      - "ghcr.io/andmetoo/mailcatcher:{{ .Version }}-amd64"
+      - "ghcr.io/andmetoo/mailcatcher:{{ .Version }}-arm64"
+
+  - name_template: "ghcr.io/andmetoo/mailcatcher:latest"
+    image_templates:
+      - "ghcr.io/andmetoo/mailcatcher:latest-amd64"
+      - "ghcr.io/andmetoo/mailcatcher:latest-arm64"
+
+release:
+  github:
+    owner: andmetoo
+    name: mailcatcher
+  draft: false
+  prerelease: auto
+  mode: replace
+  header: |
+    ## mailcatcher {{.Version}}
+
+    In-process SMTP mail catcher for Go testing and standalone use.
+  footer: |
+    **Full Changelog**: https://github.com/andmetoo/mailcatcher/compare/{{ .PreviousTag }}...{{ .Tag }}
